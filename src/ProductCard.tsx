@@ -2,16 +2,16 @@ import type { Product } from './products'
 
 type Props = {
   product: Product
+  // Data goes down as props; events go up through a function prop.
+  onAdd: () => void
 }
 
-// Props arrive as the function's parameter. They are read-only:
-// a child never changes what its parent passed down.
-export function ProductCard({ product }: Props) {
+export function ProductCard({ product, onAdd }: Props) {
   return (
     <div className="card">
       <h3>{product.name}</h3>
       <p>{product.price} บาท</p>
-      <button>เพิ่มลงตะกร้า</button>
+      <button onClick={onAdd}>เพิ่มลงตะกร้า</button>
     </div>
   )
 }
