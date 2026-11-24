@@ -1,32 +1,28 @@
-# React + TypeScript + Vite
+# React shop demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A tiny breakfast shop with a cart, built step by step to explain the core ideas of React.
+Companion code for the breakfastz video "React คืออะไร ทำไมเดฟทั่วโลกใช้ + สอนตั้งแต่ศูนย์" (breakfastz.dev).
 
-Currently, two official plugins are available:
+Each step is a commit and a tag, so you can check out any point of the video:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Tag | Idea |
+|---|---|
+| `step-0-scaffold` | `npm create vite@latest my-shop -- --template react-ts` |
+| `step-1-component` | A component is a function that returns JSX. Write it once, use it three times. |
+| `step-2-props` | Pass data down with props (read-only). |
+| `step-3-state` | `useState` in the common parent, derived total, never mutate state, events go up via function props. |
+| `step-4-list-effect` | `map` + `key` for lists, `useEffect` to fetch products and save the cart to `localStorage`. |
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+git clone <this repo>
+cd react-shop
+npm install
+npm run dev          # http://localhost:5173
+git checkout step-2-props   # jump to any step
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Built with React 19 and Vite 8.
+
+## License
+
+MIT

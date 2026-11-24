@@ -1,29 +1,54 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CartSummary } from './CartSummary'
 import { Header } from './Header'
 import { ProductCard } from './ProductCard'
-import { PRODUCTS, type Product } from './products'
+import type { Product } from './products'
+
+const CART_KEY = 'cart'
+
+function loadCart(): Product[] {
+  try {
+    return JSON.parse(localStorage.getItem(CART_KEY) ?? '[]')
+  } catch {
+    return []
+  }
+}
 
 export default function App() {
-  // State lives in the closest common parent: App.
-  const [items, setItems] = useState<Product[]>([])
+  const [products, setProducts] = useState<Product[]>([])
+  const [items, setItems] = useState<Product[]>(loadCart)
 
-  // Derived value: computed on every render, never stored as state.
+  // Talking to the outside world is a side effect: it runs after React renders.
+  // Empty dependency array = run once when the component mounts.
+  useEffect(() => {
+    let ignore = false
+    fetch('/products.json')
+      .then((res) => res.json())
+      .then((data: Product[]) => {
+        if (!ignore) setProducts(data)
+      })
+    return () => {
+      ignore = true
+    }
+  }, [])
+
+  // [items] = run again every time the cart changes.
+  useEffect(() => {
+    localStorage.setItem(CART_KEY, JSON.stringify(items))
+  }, [items])
+
   const total = items.reduce((sum, p) => sum + p.price, 0)
-
-  // Never mutate state (items.push(p) would not re-render). Always create a new array.
   const add = (product: Product) => setItems([...items, product])
   const remove = (index: number) => setItems(items.filter((_, i) => i !== index))
 
-  // UI = f(state): the badge, the list and the total all read the same `items`,
-  // so they can never disagree.
   return (
     <main className="shop">
       <Header count={items.length} />
       <div className="grid">
-        <ProductCard product={PRODUCTS[0]} onAdd={() => add(PRODUCTS[0])} />
-        <ProductCard product={PRODUCTS[1]} onAdd={() => add(PRODUCTS[1])} />
-        <ProductCard product={PRODUCTS[2]} onAdd={() => add(PRODUCTS[2])} />
+        {/* map turns an array of data into an array of components. key = a stable id, not the index. */}
+        {products.map((p) => (
+          <ProductCard key={p.id} product={p} onAdd={() => add(p)} />
+        ))}
       </div>
       <CartSummary items={items} total={total} onRemove={remove} />
     </main>
