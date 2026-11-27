@@ -4,6 +4,7 @@ import { CartSummary } from '../components/CartSummary'
 import { Header } from '../components/Header'
 import { ProductCard } from '../components/ProductCard'
 import type { Product } from '../components/products'
+import { getProducts } from '../server/products'
 
 const CART_KEY = 'cart'
 
@@ -16,27 +17,23 @@ function loadCart(): Product[] {
 }
 
 function App() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [items, setItems] = useState<Product[]>(loadCart)
+  // Loader data: fetched on the server for the first request, so it is in the HTML.
+  const products = Route.useLoaderData()
 
-  // Talking to the outside world is a side effect: it runs after React renders.
-  // Empty dependency array = run once when the component mounts.
+  // Start empty so the server HTML and the first browser render match.
+  const [items, setItems] = useState<Product[]>([])
+  const [loaded, setLoaded] = useState(false)
+
+  // localStorage only exists in the browser: read it after the first render.
   useEffect(() => {
-    let ignore = false
-    fetch('/products.json')
-      .then((res) => res.json())
-      .then((data: Product[]) => {
-        if (!ignore) setProducts(data)
-      })
-    return () => {
-      ignore = true
-    }
+    setItems(loadCart())
+    setLoaded(true)
   }, [])
 
   // [items] = run again every time the cart changes.
   useEffect(() => {
-    localStorage.setItem(CART_KEY, JSON.stringify(items))
-  }, [items])
+    if (loaded) localStorage.setItem(CART_KEY, JSON.stringify(items))
+  }, [items, loaded])
 
   const total = items.reduce((sum, p) => sum + p.price, 0)
   const add = (product: Product) => setItems([...items, product])
@@ -56,4 +53,7 @@ function App() {
   )
 }
 
-export const Route = createFileRoute('/')({ component: App })
+export const Route = createFileRoute('/')({
+  loader: () => getProducts(),
+  component: App,
+})
