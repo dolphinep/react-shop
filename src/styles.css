@@ -16,3 +16,5 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 .summary { margin-top: 24px; display: flex; gap: 16px; align-items: center; justify-content: flex-end; font-size: 1.2rem; }
 .cart-list { list-style: none; padding: 0; margin: 24px 0 0; }
 .cart-list li { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #d0d7de; }
+.card h3 a { color: inherit; }
+.detail { margin-top: 16px; }
