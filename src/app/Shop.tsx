@@ -17,12 +17,19 @@ function loadCart(): Product[] {
 }
 
 export function Shop({ products }: { products: Product[] }) {
-  const [items, setItems] = useState<Product[]>(loadCart)
+  // Start empty so the server HTML and the first browser render match.
+  const [items, setItems] = useState<Product[]>([])
+  const [loaded, setLoaded] = useState(false)
 
-  // [items] = run again every time the cart changes.
+  // localStorage only exists in the browser: read it after the first render.
   useEffect(() => {
-    localStorage.setItem(CART_KEY, JSON.stringify(items))
-  }, [items])
+    setItems(loadCart())
+    setLoaded(true)
+  }, [])
+
+  useEffect(() => {
+    if (loaded) localStorage.setItem(CART_KEY, JSON.stringify(items))
+  }, [items, loaded])
 
   const total = items.reduce((sum, p) => sum + p.price, 0)
   const add = (product: Product) => setItems([...items, product])
