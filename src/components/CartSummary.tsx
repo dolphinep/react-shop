@@ -4,9 +4,10 @@ type Props = {
   items: Product[]
   total: number
   onRemove: (index: number) => void
+  onCheckout: () => void
 }
 
-export function CartSummary({ items, total, onRemove }: Props) {
+export function CartSummary({ items, total, onRemove, onCheckout }: Props) {
   return (
     <section>
       <ul className="cart-list">
@@ -20,7 +21,7 @@ export function CartSummary({ items, total, onRemove }: Props) {
       </ul>
       <div className="summary">
         <strong>รวม {total} บาท</strong>
-        <button disabled={items.length === 0}>ชำระเงิน</button>
+        <button disabled={items.length === 0} onClick={onCheckout}>ชำระเงิน</button>
       </div>
     </section>
   )

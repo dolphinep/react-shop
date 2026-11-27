@@ -4,7 +4,7 @@ import { CartSummary } from '../components/CartSummary'
 import { Header } from '../components/Header'
 import { ProductCard } from '../components/ProductCard'
 import type { Product } from '../components/products'
-import { getProducts } from '../server/products'
+import { getProducts, placeOrder } from '../server/products'
 
 const CART_KEY = 'cart'
 
@@ -37,6 +37,12 @@ function App() {
 
   const total = items.reduce((sum, p) => sum + p.price, 0)
   const add = (product: Product) => setItems([...items, product])
+  const checkout = async () => {
+    // Called like a normal function; Start turns it into a request to the server.
+    const order = await placeOrder({ data: items.map((p) => p.id) })
+    alert(`สั่งซื้อแล้ว #${order.orderId} · ${order.total} บาท`)
+    setItems([])
+  }
   const remove = (index: number) => setItems(items.filter((_, i) => i !== index))
 
   return (
@@ -48,7 +54,7 @@ function App() {
           <ProductCard key={p.id} product={p} onAdd={() => add(p)} />
         ))}
       </div>
-      <CartSummary items={items} total={total} onRemove={remove} />
+      <CartSummary items={items} total={total} onRemove={remove} onCheckout={checkout} />
     </main>
   )
 }
