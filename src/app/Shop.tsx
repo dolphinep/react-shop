@@ -22,7 +22,9 @@ export function Shop({ products }: { products: Product[] }) {
   const [loaded, setLoaded] = useState(false)
 
   // localStorage only exists in the browser: read it after the first render.
+  // Two-pass render (react.dev: "Displaying different content on the server and the client").
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time read of browser-only storage after hydration
     setItems(loadCart())
     setLoaded(true)
   }, [])
@@ -33,6 +35,17 @@ export function Shop({ products }: { products: Product[] }) {
 
   const total = items.reduce((sum, p) => sum + p.price, 0)
   const add = (product: Product) => setItems([...items, product])
+  const checkout = async () => {
+    // Send only the product ids. The server works out the price.
+    const res = await fetch('/api/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: items.map((p) => p.id) }),
+    })
+    const order: { orderId: string; total: number } = await res.json()
+    alert(`สั่งซื้อแล้ว #${order.orderId} · ${order.total} บาท`)
+    setItems([])
+  }
   const remove = (index: number) => setItems(items.filter((_, i) => i !== index))
 
   return (
@@ -44,7 +57,7 @@ export function Shop({ products }: { products: Product[] }) {
           <ProductCard key={p.id} product={p} onAdd={() => add(p)} />
         ))}
       </div>
-      <CartSummary items={items} total={total} onRemove={remove} />
+      <CartSummary items={items} total={total} onRemove={remove} onCheckout={checkout} />
     </main>
   )
 }
